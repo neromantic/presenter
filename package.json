@@ -2,10 +2,11 @@
   "name": "presenter",
   "productName": "presenter",
   "version": "1.0.0",
-  "description": "My Electron application description",
-  "main": "src/index.js",
+  "description": "Presenter - Hintergrundeditor für Videokonferenzen",
+  "main": "background.js",
   "scripts": {
     "start": "electron-forge start",
+    "watch": "electron-forge start --watch",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -18,7 +19,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "jquery": "latest",
+    "bootstrap": "^5.2.2"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0",

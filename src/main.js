@@ -1,3 +1,11 @@
-import ElementsModelView from "./modelViews/ElementsModelView.js";
+import ModelView from "./modelView.js";
 
-const elementsModelView = new ElementsModelView();
+const _ModelView = new ModelView();
+
+/**
+ * @param {string} command
+ * @param {any|null} data
+ */
+function fireCommand(command, data = null) {
+    _ModelView["handle" + command](data);
+}

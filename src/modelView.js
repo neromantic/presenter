@@ -14,6 +14,6 @@ export default class ModelView {
     _preview = new Preview();
 
     constructor() {
-        this._editor.loadElements({ Rectangle: {x:10, y: 10, w: 40, h: 50, color:'#203040'} });
+        this._editor.loadElements({ Rectangle: {x:110, y: 100, w: 40, h: 50, color:'#203040'}, Circle : {x:150, y: 150, w: 40, h: 50, color:'#203040'} });
     }
 }

@@ -7,21 +7,22 @@
     <title>Presenter</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css"/>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="../node_modules/createjs/builds/createjs-2015.11.26.min.js"></script>
+
     <link rel="stylesheet" href="style.css"/>
     <script type="module" src="main.js"></script>
 </head>
 <body>
 <div class="row vh-100 g-0">
-    <div class="col-2" id="elements-window"></div>
+    <div class="col-2 border-end" id="elements-window"></div>
     <div class="col row g-0">
-        <div class="col-12 h-50" id="editor-window">
+        <div class="col-12" id="editor-window">
             <canvas id="preview-stack-window"></canvas>
             <canvas id="editor-stack-window"></canvas>
         </div>
-        <div class="col-12 h-50" id="control-window">
-        </div>
+        <div class="col-12 border-top bg-light" id="control-window"></div>
     </div>
-    <div class="col-2" id="option-window"></div>
+    <div class="col-2 border-start" id="option-window"></div>
 </div>
 </body>
 </html>

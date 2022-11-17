@@ -6,23 +6,69 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
     <title>Presenter</title>
     <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css"/>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="../node_modules/createjs/builds/createjs-2015.11.26.min.js"></script>
-
     <link rel="stylesheet" href="style.css"/>
     <script type="module" src="main.js"></script>
 </head>
 <body>
 <div class="row vh-100 g-0">
-    <div class="col-2 border-end" id="elements-window"></div>
-    <div class="col row g-0">
-        <div class="col-12" id="editor-window">
-            <canvas id="preview-stack-window"></canvas>
-            <canvas id="editor-stack-window"></canvas>
+    <div class="border-end" id="elements-window">
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item " onclick="window.fireCommand('AddElement', {type: 'Circle'})">
+                <span>Kreis</span><i class="bi-circle float-end"></i>
+            </a>
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Rectangle'})">
+                <span>Rechteck</span><i class="bi-square float-end"></i>
+            </a>
         </div>
-        <div class="col-12 border-top bg-light" id="control-window"></div>
     </div>
-    <div class="col-2 border-start" id="option-window"></div>
+    <div class="col row g-0 bg-light">
+            <div class="col-12 " id="editor-window">
+                <canvas id="preview-stack-window"></canvas>
+                <canvas class="bg-white" id="editor-stack-window"></canvas>
+            </div>
+        <div class="col-12" id="control-window"></div>
+    </div>
+    <div class="border-start" id="option-window"></div>
 </div>
+<script>
+    const editor = document.getElementById('editor-stack-window');
+    const preview = document.getElementById('preview-stack-window');
+
+    function resizeEditor() {
+        const w = document.getElementById('editor-window').offsetWidth;
+        const h = document.getElementById('editor-window').offsetHeight;
+        const editorH = w / 1.7777;
+        const editorRH = h * 1.777;
+        if(h > editorH) {
+            editor.style.width = w + 'px';
+            editor.style.height = editorH + 'px';
+            preview.style.width = w + 'px';
+            preview.style.height = editorH + 'px';
+
+            editor.width = editorRH;
+            editor.height = h;
+
+            preview.width = editorRH;
+            preview.height = h;
+        } else {
+            editor.style.height = h + 'px';
+            editor.style.width = editorRH + 'px';
+            preview.style.height = h + 'px';
+            preview.style.width = editorRH + 'px';
+
+            editor.width = editorRH;
+            editor.height = h;
+
+            preview.width = editorRH;
+            preview.height = h;
+        }
+
+    }
+    resizeEditor();
+    window.addEventListener('resize', resizeEditor)
+</script>
 </body>
 </html>

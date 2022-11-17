@@ -1,19 +1,20 @@
 import Element from './element.js';
 
 export default class Circle extends Element {
-    /**
-     * @param {{
-     *     x: number,
-     *     y: number,
-     *     w: number,
-     *     h: number,
-     *     color?: string
-     * }} data,
-     * @param {createjs.Stage} stage
-     */
-    constructor(data, stage) {
-        super('Circle', data, stage);
-        this.w = this.shape.graphics.command.radius;
-        this.h = this.shape.graphics.command.radius;
+    getGraphics(data) {
+        const graphics = new createjs.Graphics();
+        graphics.beginFill(data.color ?? null);
+        graphics.drawEllipse (0, 0, data.w, data.h, data.w / 2);
+        return graphics;
     }
+
+    setShapeW(w) {
+        this.graphics.command.w = w;
+        this.controlShape.graphics.command.w = w;
+    }
+    setShapeH(h) {
+        this.graphics.command.h = h;
+        this.controlShape.graphics.command.h = h;
+    }
+
 }

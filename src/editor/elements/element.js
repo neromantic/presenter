@@ -1,10 +1,13 @@
 const CONTROL_COLOR = '#00b8ff';
-
+const DEFAULT_SHAPE_COLOR = '#8f8f8f';
+const DEFAULT_WIDTH = 50;
+const DEFAULT_HEIGHT = 50;
+const X_CENTER_POSITION = Math.floor(document.getElementById('editor-window').offsetWidth / 2);
+const Y_CENTER_POSITION = Math.floor(document.getElementById('editor-window').offsetHeight / 2);
 export default class Element {
     controlShowed = false;
 
     /**
-     * @param {string} shape
      * @param {{
      *     x: number,
      *     y: number,
@@ -14,124 +17,157 @@ export default class Element {
      * }} data
      * @param stage
      */
-    constructor(shape, data, stage) {
+    constructor(name, data, stage) {
+        this.name = name;
         this.stage = stage;
-        this.shape = new createjs.Shape();
 
-        this.x = data.x;
-        this.y = data.y;
-        this.w = data.w;
-        this.h = data.h;
+        const dataKeys = Object.keys(data);
+        if(!('x' in dataKeys)) data.x = X_CENTER_POSITION;
+        if(!('y' in dataKeys)) data.y = Y_CENTER_POSITION;
+        if(!('w' in dataKeys)) data.w = DEFAULT_WIDTH;
+        if(!('h' in dataKeys)) data.h = DEFAULT_HEIGHT;
+        if(!('color' in dataKeys)) data.color = DEFAULT_SHAPE_COLOR;
 
-        if (data.color) {
-            this.shape.graphics.beginFill(data.color);
-        }
-        this.shape.graphics['draw' + shape](data.x, data.y, data.w, data.h);
+        this.graphics = this.getGraphics(data);
+        this.shape = new createjs.Shape(this.graphics);
+
+        this.drawControl(data);
+
+        this.setSize(data.w, data.h);
+        this.setPosition(data.x, data.y);
+
+        this.setShapeX(data.x);
+        this.setShapeY(data.y);
+
+        this.setShapeW(data.w);
+        this.setShapeH(data.h);
 
         this.stage.addChild(this.shape);
-        this.initControl();
     }
 
-    initControl() {
+    getGraphics(data) {
+        const graphics = new createjs.Graphics();
+        graphics.beginFill(data.color ?? null);
+        graphics.drawRect(0, 0, data.w, data.h);
+        return graphics;
+    }
+
+    setPosition(x = null, y = null) {
+        if (x !== null) this.x = x;
+        if (y !== null) this.y = y;
+    }
+
+    setSize(w = null, h = null) {
+        if (w !== null) this.w = w;
+        if (h !== null) this.h = h;
+    }
+
+    setShapeX(x) {
+        this.shape.x = x;
+        this.controlShape.x = x;
+    }
+
+    setShapeY(y) {
+        this.shape.y = y;
+        this.controlShape.y = y;
+    }
+
+    setShapeW(w) {
+        this.graphics.command.w = w;
+        this.controlShape.graphics.command.w = w;
+    }
+
+    setShapeH(h) {
+        this.graphics.command.h = h;
+        this.controlShape.graphics.command.h = h;
+    }
+
+    drawControl(data) {
         this.controlShape = new createjs.Shape();
         this.controlShape.graphics.setStrokeStyle(2).beginStroke(CONTROL_COLOR);
-        this.controlShape.graphics.drawRect(this.shape.graphics.command.x, this.shape.graphics.command.y, this.shape.graphics.command.w, this.shape.graphics.command.h);
+        this.controlShape.graphics.drawRect(0, 0, data.w ?? 50, data.h ?? 50);
 
         this.shape.on('click', (event) => {
-            if (event.stageX > this.x  && event.stageX < this.x  + this.w && event.stageY > this.y && event.stageX < this.y + this.h) {
-                event.stopPropagation();
-                this.showControl();
-            }
+            event.stopPropagation();
+            this.showControl();
         });
 
         this.controlShape.on('mouseover', (event) => {
-            const controlPosition = event.target.graphics.command;
-            if (
-                (event.stageX > controlPosition.x + controlPosition.w - 2 || event.stageX < controlPosition.x + 2)
-                &&
-                (event.stageY > controlPosition.y + 2 && event.stageY < controlPosition.y + controlPosition.h - 2)
-            ) {
+            if ((event.stageX > event.target.x + event.target.graphics.command.w - 2 || event.stageX < event.target.x + 2) && (event.stageY > event.target.y + 2 && event.stageY < event.target.y + event.target.graphics.command.h - 2)) {
+                this.horizontalControl = true;
                 document.getElementById('editor-stack-window').classList.add('resize-horizontal');
                 document.getElementById('editor-stack-window').classList.remove('resize-vertical');
             } else {
+                this.verticalControl = true;
                 document.getElementById('editor-stack-window').classList.add('resize-vertical');
                 document.getElementById('editor-stack-window').classList.remove('resize-horizontal');
             }
         });
 
         this.controlShape.on('mouseout', (event) => {
-            document.getElementById('editor-stack-window').classList.remove('resize-horizontal');
-            document.getElementById('editor-stack-window').classList.remove('resize-vertical');
+            if (!this.controled) {
+                document.getElementById('editor-stack-window').classList.remove('resize-horizontal');
+                document.getElementById('editor-stack-window').classList.remove('resize-vertical');
+                delete this.horizontalControl;
+                delete this.verticalControl;
+            }
         });
 
         this.shape.on('pressmove', (event) => {
-            if(this.controlShowed) {
+            if (this.controlShowed) {
                 if (this.holdPositionX === undefined) {
-                    this.holdPositionX = event.stageX - this.shape.graphics.command.x;
+                    this.holdPositionX = event.stageX - this.x;
                 }
                 if (this.holdPositionY === undefined) {
-                    this.holdPositionY = event.stageY - this.shape.graphics.command.y;
+                    this.holdPositionY = event.stageY - this.y;
                 }
 
-                this.shape.graphics.command.x = event.stageX - this.holdPositionX;
-                this.controlShape.graphics.command.x = event.stageX - this.holdPositionX;
-                this.shape.graphics.command.y = event.stageY - this.holdPositionY;
-                this.controlShape.graphics.command.y = event.stageY - this.holdPositionY;
+                this.setShapeX(event.stageX - this.holdPositionX);
+                this.setShapeY(event.stageY - this.holdPositionY)
             }
         });
 
         this.shape.on('pressup', (event) => {
             delete this.holdPositionX;
             delete this.holdPositionY;
-            this.x = this.shape.graphics.command.x;
-            this.y = this.shape.graphics.command.y;
+            this.setPosition(this.shape.x,  this.shape.y);
         });
 
         this.controlShape.on('pressmove', (event) => {
-            const controlPosition = event.target.graphics.command;
-            if(this.holdPositionY === undefined) {
-                this.holdPositionY = event.rawY < controlPosition.y + 2 || event.rawY > controlPosition.y + controlPosition.h - 2;
-            }
-            if(this.holdPositionX === undefined) {
-                this.holdPositionX = event.rawY > controlPosition.y + 2 && event.rawY < controlPosition.y + controlPosition.h - 2;
-            }
+            this.controled = true;
+            const centerX = this.controlShape.x + (this.controlShape.graphics.command.w / 2);
+            const centerY = this.controlShape.y + (this.controlShape.graphics.command.h / 2);
             switch (true) {
-                case event.stageX > controlPosition.x + (controlPosition.w / 2) && this.holdPositionX:
-                    this.controlShape.graphics.command.w = event.stageX - this.controlShape.graphics.command.x;
-                    this.shape.graphics.command.w = event.stageX - this.shape.graphics.command.x;
+                case event.stageX > centerX && this.horizontalControl:
+                    this.setShapeW(event.stageX - this.controlShape.x)
                     break;
-                case event.stageX < controlPosition.x + (controlPosition.w / 2) && this.holdPositionX:
-                    this.controlShape.graphics.command.w = this.controlShape.graphics.command.w + (this.controlShape.graphics.command.x - event.stageX);
-                    this.controlShape.graphics.command.x = event.stageX
-                    this.shape.graphics.command.w = this.shape.graphics.command.w + (this.shape.graphics.command.x - event.stageX);
-                    this.shape.graphics.command.x = event.stageX;
+                case event.stageX < centerX && this.horizontalControl:
+                    const x = event.stageX;
+                    const w = this.controlShape.graphics.command.w + (this.controlShape.x - event.stageX);
+                    this.setShapeX(x);
+                    this.setShapeW(w)
                     break;
-                case event.stageY > controlPosition.y + (controlPosition.h / 2) && this.holdPositionY:
-                    this.controlShape.graphics.command.h = event.stageY - this.controlShape.graphics.command.y;
-                    this.shape.graphics.command.h = event.stageY - this.shape.graphics.command.y;
+                case event.stageY > centerY && this.verticalControl:
+                    this.setShapeH(event.stageY - this.controlShape.y)
                     break;
-                case event.stageY < controlPosition.y + (controlPosition.h / 2) && this.holdPositionY:
-                    this.controlShape.graphics.command.h = this.controlShape.graphics.command.h + (this.controlShape.graphics.command.y - event.stageY);
-                    this.controlShape.graphics.command.y = event.stageY
-                    this.shape.graphics.command.h = this.shape.graphics.command.h + (this.shape.graphics.command.y - event.stageY);
-                    this.shape.graphics.command.y = event.stageY;
+                case event.stageY < centerY && this.verticalControl:
+                    const y = event.stageY;
+                    const h = this.shape.graphics.command.h + (this.shape.y - event.stageY);
+                    this.setShapeY(y);
+                    this.setShapeH(h)
                     break;
             }
-            this.stage.update();
         });
 
         this.controlShape.on('pressup', (event) => {
-            delete this.holdPositionX;
-            delete this.holdPositionY;
-            this.x = this.shape.graphics.command.x;
-            this.w = this.shape.graphics.command.w;
-            this.y = this.shape.graphics.command.y;
-            this.h = this.shape.graphics.command.h;
+            delete this.controled;
+            this.setSize(this.controlShape.graphics.command.w, this.controlShape.graphics.command.h)
         })
     }
 
     showControl() {
         if (!this.controlShowed) {
+            this.stage.releaseControl(this);
             this.stage.addChild(this.controlShape);
             this.controlShowed = true;
         }

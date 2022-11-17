@@ -8,12 +8,14 @@ body {
 #editor-window {
   display: block;
   position: relative;
+  height: calc(100% - 200px);
 }
 
 #editor-window canvas {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform: translate(-50%);
 }
 
 #editor-stack-window.resize-vertical {
@@ -22,4 +24,12 @@ body {
 
 #editor-stack-window.resize-horizontal {
   cursor: e-resize;
+}
+
+#elements-window, #option-window {
+  width: 150px;
+}
+
+#control-window {
+  height: 200px;
 }

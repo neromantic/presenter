@@ -29,8 +29,11 @@ export default class Element {
         if(!('color' in dataKeys)) data.color = DEFAULT_SHAPE_COLOR;
 
         this.graphics = this.getGraphics(data);
-        this.shape = new createjs.Shape(this.graphics);
-
+        this.shape = this.getShape(data);
+        this.shape.regX = this.w / 2;
+        this.shape.regY = this.h / 2;
+        this.shape.shadow = new createjs.Shadow('#000',4,4,5);
+        this.stage.addChild(this.shape);
         this.drawControl(data);
 
         this.setSize(data.w, data.h);

@@ -16,11 +16,14 @@
 <div class="row vh-100 g-0">
     <div class="border-end" id="elements-window">
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item " onclick="window.fireCommand('AddElement', {type: 'Circle'})">
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Circle'})">
                 <span>Kreis</span><i class="bi-circle float-end"></i>
             </a>
             <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Rectangle'})">
                 <span>Rechteck</span><i class="bi-square float-end"></i>
+            </a>
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Text'})">
+                <span>Text</span><i class="bi-text-center float-end"></i>
             </a>
         </div>
     </div>
@@ -31,7 +34,34 @@
             </div>
         <div class="col-12" id="control-window"></div>
     </div>
-    <div class="border-start" id="option-window"></div>
+    <div class="border-start h-100 overflow-auto" id="option-window">
+        <div class="list-group list-group-flush">
+            <div class="list-group-item">
+                <input class="form-control form-control-sm" placeholder="Name" name="name">
+            </div>
+            <div class="list-group-item">
+                <small class="text-black-50">Position</small>
+                <input class="form-control form-control-sm mt-2" placeholder="X" name="position-x">
+                <input class="form-control form-control-sm mt-2" placeholder="Y" name="position-y">
+            </div>
+            <div class="list-group-item">
+                <small class="text-black-50">Größe</small>
+                <input class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="width">
+                <input class="form-control form-control-sm mt-2" placeholder="Höhe (h)" name="height">
+            </div>
+            <div class="list-group-item">
+                <small class="text-black-50">Farbe</small>
+                <input type="color" class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="shape-color">
+            </div>
+            <div class="list-group-item">
+                <small class="text-black-50">Schatten</small>
+                <input type="color" class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="shadow-color">
+                <input class="form-control form-control-sm mt-2" placeholder="X" name="shadow-x">
+                <input class="form-control form-control-sm mt-2" placeholder="Y" name="shadow-y">
+                <input class="form-control form-control-sm mt-2" placeholder="Verwischen px" name="blur-x">
+            </div>
+        </div>
+    </div>
 </div>
 <script>
     const editor = document.getElementById('editor-stack-window');

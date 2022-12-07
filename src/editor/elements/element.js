@@ -44,8 +44,7 @@ export default class Element {
 
         this.setShapeW(data.w);
         this.setShapeH(data.h);
-
-        this.stage.addChild(this.shape);
+        this.color = data.color || '#eeeeee';
     }
 
     getGraphics(data) {
@@ -53,6 +52,10 @@ export default class Element {
         graphics.beginFill(data.color ?? null);
         graphics.drawRect(0, 0, data.w, data.h);
         return graphics;
+    }
+
+    getShape(data) {
+        return new createjs.Shape(this.graphics);
     }
 
     setPosition(x = null, y = null) {
@@ -70,9 +73,17 @@ export default class Element {
         this.controlShape.x = x;
     }
 
+    getShapeX() {
+        return this.shape.x;
+    }
+
     setShapeY(y) {
         this.shape.y = y;
         this.controlShape.y = y;
+    }
+
+    getShapeY() {
+        return this.shape.y;
     }
 
     setShapeW(w) {
@@ -80,19 +91,28 @@ export default class Element {
         this.controlShape.graphics.command.w = w;
     }
 
+    getShapeW() {
+        return this.graphics.command.w;
+    }
+
     setShapeH(h) {
         this.graphics.command.h = h;
         this.controlShape.graphics.command.h = h;
+    }
+
+    getShapeH() {
+        return this.graphics.command.h;
     }
 
     drawControl(data) {
         this.controlShape = new createjs.Shape();
         this.controlShape.graphics.setStrokeStyle(2).beginStroke(CONTROL_COLOR);
         this.controlShape.graphics.drawRect(0, 0, data.w ?? 50, data.h ?? 50);
+        this.stage.addChild(this.controlShape);
 
         this.shape.on('click', (event) => {
             event.stopPropagation();
-            this.showControl();
+            window.fireCommand('SelectElement', {name: this.name})
         });
 
         this.controlShape.on('mouseover', (event) => {
@@ -133,7 +153,7 @@ export default class Element {
         this.shape.on('pressup', (event) => {
             delete this.holdPositionX;
             delete this.holdPositionY;
-            this.setPosition(this.shape.x,  this.shape.y);
+            this.setPosition(this.getShapeX(),  this.getShapeY());
         });
 
         this.controlShape.on('pressmove', (event) => {
@@ -155,7 +175,7 @@ export default class Element {
                     break;
                 case event.stageY < centerY && this.verticalControl:
                     const y = event.stageY;
-                    const h = this.shape.graphics.command.h + (this.shape.y - event.stageY);
+                    const h = this.controlShape.graphics.command.h + (this.controlShape.y - event.stageY);
                     this.setShapeY(y);
                     this.setShapeH(h)
                     break;
@@ -170,15 +190,16 @@ export default class Element {
 
     showControl() {
         if (!this.controlShowed) {
-            this.stage.releaseControl(this);
-            this.stage.addChild(this.controlShape);
+            this.controlShape.visible = true;
+            this.stage.setChildIndex(this.shape,this.stage.getNumChildren()-2)
+            this.stage.setChildIndex(this.controlShape,this.stage.getNumChildren()-1)
             this.controlShowed = true;
         }
     }
 
     hideControl() {
         if (this.controlShowed) {
-            this.stage.removeChild(this.controlShape);
+            this.controlShape.visible = false;
             this.controlShowed = false;
         }
     }

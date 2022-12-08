@@ -18,11 +18,13 @@ export default class Text extends Element {
         this.shape.max = h / 10;
         this.controlShape.graphics.command.h = h;
     }
+    setColor(color = null) {
+        this.shape.color = color;
+    }
 
     updateShape() {
         this.shape.font = this.figure.text.size + 'px Arial';
         this.shape.text = this.figure.text.text;
-        this.shape.color = this.figure.color;
         super.updateShape();
     }
 }

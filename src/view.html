@@ -1,142 +1,170 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
     <title>Presenter</title>
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css"/>
-    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css"/>
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" />
     <script src="../node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script src="../node_modules/createjs/builds/createjs-2015.11.26.min.js"></script>
-    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="style.css" />
     <script type="module" src="main.js"></script>
+
 </head>
+
 <body>
-<div class="row vh-100 g-0">
-    <div class="border-end" id="elements-window">
-        <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Circle'})">
-                <span>Kreis</span><i class="bi-circle float-end"></i>
-            </a>
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Rectangle'})">
-                <span>Rechteck</span><i class="bi-square float-end"></i>
-            </a>
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Text'})">
-                <span>Text</span><i class="bi-text-center float-end"></i>
-            </a>
+    <div class="row vh-100 g-0">
+        <div class="border-end" id="elements-window">
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Circle'})">
+                    <span>Kreis</span><i class="bi-circle float-end"></i>
+                </a>
+                <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Rectangle'})">
+                    <span>Rechteck</span><i class="bi-square float-end"></i>
+                </a>
+                <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Text'})">
+                    <span>Text</span><i class="bi-text-center float-end"></i>
+                </a>
+            </div>
         </div>
-    </div>
-    <div class="col row g-0 bg-light">
-            <div class="col-12 " id="editor-window">
+        <div class="col row g-0 bg-light">
+            <div class="col-12" id="editor-window">
+                <video hidden id="preview-video" autoplay></video>
                 <canvas id="preview-stack-window"></canvas>
                 <canvas class="bg-white" id="editor-stack-window"></canvas>
             </div>
-        <div class="col-12" id="control-window"></div>
-    </div>
-    <div class="border-start h-100 overflow-auto" id="option-window">
-        <div class="list-group list-group-flush">
-            <div class="list-group-item" id="text-block" style="display: none">
-                <small class="text-black-50">Text</small>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">Text</span>
-                    <input class="form-control " name="text-text" onchange="window.fireCommand('EditFigure', {field: 'text.text', value: this.value})">
-                </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">Gewicht</span>
-                    <input class="form-control" name="text-weight" onchange="window.fireCommand('EditFigure', {field: 'text.weight', value: this.value})">
-                </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">Größe</span>
-                    <input class="form-control" name="text-size" onchange="window.fireCommand('EditFigure', {field: 'text.size', value: this.value})">
+            <div class="col-12 row pt-5 px-5" id="control-window">
+                <div class="col-2">
+                    <div class="form-check">
+                        <input name="preview" class="form-check-input" type="checkbox"
+                            onchange="window.fireCommand(this.selected ? 'PreviewmodusON' :  'PreviewmodusOFF')" />
+                        <label class="form-check-label" for="preview">
+                            Preview Modus
+                        </label>
+                    </div>
                 </div>
             </div>
-            <div class="list-group-item">
-                <small class="text-black-50">Position</small>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">x</span>
-                    <input class="form-control " name="position-x" onchange="window.fireCommand('EditFigure', {field: 'x', value: this.value})">
+        </div>
+        <div class="border-start h-100 overflow-auto" id="option-window">
+            <div class="list-group list-group-flush">
+                <div class="list-group-item" id="text-block" style="display: none">
+                    <small class="text-black-50">Text</small>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Text</span>
+                        <input class="form-control" name="text-text"
+                            onchange="window.fireCommand('EditFigure', {field: 'text.text', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Gewicht</span>
+                        <input class="form-control" name="text-weight"
+                            onchange="window.fireCommand('EditFigure', {field: 'text.weight', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Größe</span>
+                        <input class="form-control" name="text-size"
+                            onchange="window.fireCommand('EditFigure', {field: 'text.size', value: this.value})" />
+                    </div>
                 </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">y</span>
-                    <input class="form-control" name="position-y" onchange="window.fireCommand('EditFigure', {field: 'y', value: this.value})">
+                <div class="list-group-item">
+                    <small class="text-black-50">Position</small>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">x</span>
+                        <input class="form-control" name="position-x"
+                            onchange="window.fireCommand('EditFigure', {field: 'x', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">y</span>
+                        <input class="form-control" name="position-y"
+                            onchange="window.fireCommand('EditFigure', {field: 'y', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">z</span>
+                        <input class="form-control" name="position-z"
+                            onchange="window.fireCommand('EditFigure', {field: 'z', value: this.value})" />
+                    </div>
                 </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">z</span>
-                    <input class="form-control" name="position-z" onchange="window.fireCommand('EditFigure', {field: 'z', value: this.value})">
+                <div class="list-group-item">
+                    <small class="text-black-50">Größe</small>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Länge</span>
+                        <input class="form-control" name="width"
+                            onchange="window.fireCommand('EditFigure', {field: 'w', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Höhe</span>
+                        <input class="form-control" name="height"
+                            onchange="window.fireCommand('EditFigure', {field: 'h', value: this.value})" />
+                    </div>
                 </div>
-            </div>
-            <div class="list-group-item">
-                <small class="text-black-50">Größe</small>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">Länge</span>
-                    <input class="form-control" name="width" onchange="window.fireCommand('EditFigure', {field: 'w', value: this.value})">
+                <div class="list-group-item">
+                    <small class="text-black-50">Farbe</small>
+                    <input type="color" class="form-control form-control-sm mt-2" name="shape-color"
+                        onchange="window.fireCommand('EditFigure', {field: 'color', value: this.value})" />
                 </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">Höhe</span>
-                    <input class="form-control" name="height" onchange="window.fireCommand('EditFigure', {field: 'h', value: this.value})">
-                </div>
-                
-            </div>
-            <div class="list-group-item">
-                <small class="text-black-50">Farbe</small>
-                <input type="color" class="form-control form-control-sm mt-2" name="shape-color" onchange="window.fireCommand('EditFigure', {field: 'color', value: this.value})">
-            </div>
-            <div class="list-group-item">
-                <small class="text-black-50">Schatten</small>
-                <input type="color" class="form-control form-control-sm mt-2" name="shadow-color" onchange="window.fireCommand('EditFigure', {field: 'shadow.color', value: this.value})">
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">x</span>
-                    <input class="form-control"name="shadow-offsetX" onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetX', value: this.value})">
-                </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">y</span>
-                    <input class="form-control" name="shadow-offsetY" onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetY', value: this.value})">
-                </div>
-                <div class="input-group input-group-sm mt-2">
-                    <span class="input-group-text">px</span>
-                    <input class="form-control" name="shadow-blur" onchange="window.fireCommand('EditFigure', {field: 'shadow.blur', value: this.value})">
+                <div class="list-group-item">
+                    <small class="text-black-50">Schatten</small>
+                    <input type="color" class="form-control form-control-sm mt-2" name="shadow-color"
+                        onchange="window.fireCommand('EditFigure', {field: 'shadow.color', value: this.value})" />
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">x</span>
+                        <input class="form-control" name="shadow-offsetX"
+                            onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetX', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">y</span>
+                        <input class="form-control" name="shadow-offsetY"
+                            onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetY', value: this.value})" />
+                    </div>
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">px</span>
+                        <input class="form-control" name="shadow-blur"
+                            onchange="window.fireCommand('EditFigure', {field: 'shadow.blur', value: this.value})" />
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<script>
-    const editor = document.getElementById('editor-stack-window');
-    const preview = document.getElementById('preview-stack-window');
+    <script>
+        const editor = document.getElementById("editor-stack-window");
+        const preview = document.getElementById("preview-stack-window");
 
-    function resizeEditor() {
-        const w = document.getElementById('editor-window').offsetWidth;
-        const h = document.getElementById('editor-window').offsetHeight;
-        const editorH = w / 1.7777;
-        const editorRH = h * 1.777;
-        if(h > editorH) {
-            editor.style.width = w + 'px';
-            editor.style.height = editorH + 'px';
-            preview.style.width = w + 'px';
-            preview.style.height = editorH + 'px';
+        function resizeEditor() {
+            const w = document.getElementById("editor-window").offsetWidth;
+            const h = document.getElementById("editor-window").offsetHeight;
+            const editorH = w / 1.7777;
+            const editorRH = h * 1.777;
+            if (h > editorH) {
+                editor.style.width = w + "px";
+                editor.style.height = editorH + "px";
+                preview.style.width = w + "px";
+                preview.style.height = editorH + "px";
 
-            editor.width = editorRH;
-            editor.height = h;
+                editor.width = editorRH;
+                editor.height = h;
 
-            preview.width = editorRH;
-            preview.height = h;
-        } else {
-            editor.style.height = h + 'px';
-            editor.style.width = editorRH + 'px';
-            preview.style.height = h + 'px';
-            preview.style.width = editorRH + 'px';
+                preview.width = editorRH;
+                preview.height = h;
+            } else {
+                editor.style.height = h + "px";
+                editor.style.width = editorRH + "px";
+                preview.style.height = h + "px";
+                preview.style.width = editorRH + "px";
 
-            editor.width = editorRH;
-            editor.height = h;
+                editor.width = editorRH;
+                editor.height = h;
 
-            preview.width = editorRH;
-            preview.height = h;
+                preview.width = editorRH;
+                preview.height = h;
+            }
         }
-
-    }
-    resizeEditor();
-    window.addEventListener('resize', resizeEditor)
-</script>
+        resizeEditor();
+        window.addEventListener("resize", resizeEditor);
+    </script>
+    <script>
+    </script>
 </body>
+
 </html>

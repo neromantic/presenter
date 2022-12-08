@@ -36,6 +36,10 @@ export default class FigureModel {
         this.shadow = shadow || new Shadow();
         this.text = text || new Text();
     }
+
+    clone() {
+        return new FigureModel(this.type, this.x + 20, this.y - 20, null, this.width, this.height, this.color, this.shadow.clone(), this.text.clone());
+    }
 }
 
 export class Shadow {
@@ -45,6 +49,14 @@ export class Shadow {
         this.offsetY = offsetY || 0;
         this.blur = blur || 0;
     }
+
+    clone() {
+        return new Shadow(
+            this.color,
+            this.offsetX,
+            this.offsetY,
+            this.blur);
+    }
 }
 
 export class Text {
@@ -52,5 +64,12 @@ export class Text {
         this.text = text || DEFAULT_TEXT;
         this.weight = weight || DEFAULT_WEIGHT;
         this.size = size || DEFAULT_FONT_SIZE;
+    }
+
+    clone() {
+        return new Text(
+            this.text,
+            this.weight,
+            this.size);
     }
 }

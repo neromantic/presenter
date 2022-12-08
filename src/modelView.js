@@ -13,6 +13,9 @@ export default class ModelView {
             if(e.keyCode === 46) {
                 window.fireCommand('DeleteFigure');
             }
+            if(e.keyCode === 68 && e.ctrlKey) {
+                window.fireCommand('CloneFigure');
+            }
         };
     }
 d
@@ -23,6 +26,15 @@ d
         const figure = new FigureModel(data.type);
         this._figures[figure.id] = figure;
         this._selectFigureId = figure.id;
+        this._editor.addFigure(figure);
+        window.fireCommand('SelectFigure', {id: figure.id})
+    }
+    /**
+     * @param {typeof FigureModel}} data 
+     */
+    handleCloneFigure(data) {
+        const figure = this._figures[this._selectFigureId].clone();
+        this._figures[figure.id] = figure;
         this._editor.addFigure(figure);
         window.fireCommand('SelectFigure', {id: figure.id})
     }
@@ -54,6 +66,7 @@ d
                 figure.height = Number.parseInt(data.value);
                 break;
             case 'color':
+                console.log(data.value);
                 figure.color = data.value;
                 break;
             case 'shadow.color':
@@ -111,7 +124,9 @@ d
     }
 
     handleDeleteFigure() {
-        this._editor.deleteFigure(this._selectFigureId);
-        this._selectFigureId = null;
+        if(this._selectFigureId !== null) {
+            this._editor.deleteFigure(this._selectFigureId);
+            this._selectFigureId = null;
+        }
     }
 }

@@ -26,7 +26,7 @@ export default class Element {
 
     getGraphics() {
         const graphics = new createjs.Graphics();
-        graphics.beginFill(this.figure.color);
+        this.command = graphics.beginFill(this.figure.color).command;;
         graphics.drawRect(0, 0, this.figure.width, this.figure.height);
         return graphics;
     }
@@ -91,6 +91,10 @@ export default class Element {
         this.shape.shadow = new createjs.Shadow(shadow.color, shadow.offsetX, shadow.offsetY, shadow.blur);
     }
 
+    setColor(color = null) {
+        this.command.style = color;
+    }
+
     updateShape() {
         this.setShapeX(this.figure.x);
         this.setShapeY(this.figure.y);
@@ -98,6 +102,7 @@ export default class Element {
         this.setShapeH(this.figure.height);
         this.setShapeZ(this.figure.z);
         this.setShadow(this.figure.shadow);   
+        this.setColor(this.figure.color);   
     }
 
     drawControl() {

@@ -79,6 +79,7 @@ d
                 break;
         }
         this._editor.updateFigure(this._selectFigureId);
+        window.fireCommand('UpdateOptions');
     }
 
     handleDebug() {

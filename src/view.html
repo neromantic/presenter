@@ -16,13 +16,13 @@
 <div class="row vh-100 g-0">
     <div class="border-end" id="elements-window">
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Circle'})">
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Circle'})">
                 <span>Kreis</span><i class="bi-circle float-end"></i>
             </a>
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Rectangle'})">
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Rectangle'})">
                 <span>Rechteck</span><i class="bi-square float-end"></i>
             </a>
-            <a href="#" class="list-group-item" onclick="window.fireCommand('AddElement', {type: 'Text'})">
+            <a href="#" class="list-group-item" onclick="window.fireCommand('AddFigure', {type: 'Text'})">
                 <span>Text</span><i class="bi-text-center float-end"></i>
             </a>
         </div>
@@ -36,29 +36,67 @@
     </div>
     <div class="border-start h-100 overflow-auto" id="option-window">
         <div class="list-group list-group-flush">
-            <div class="list-group-item">
-                <input class="form-control form-control-sm" placeholder="Name" name="name">
+            <div class="list-group-item" id="text-block" style="display: none">
+                <small class="text-black-50">Text</small>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">Text</span>
+                    <input class="form-control " name="text-text" onchange="window.fireCommand('EditFigure', {field: 'text.text', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">Gewicht</span>
+                    <input class="form-control" name="text-weight" onchange="window.fireCommand('EditFigure', {field: 'text.weight', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">Größe</span>
+                    <input class="form-control" name="text-size" onchange="window.fireCommand('EditFigure', {field: 'text.size', value: this.value})">
+                </div>
             </div>
             <div class="list-group-item">
                 <small class="text-black-50">Position</small>
-                <input class="form-control form-control-sm mt-2" placeholder="X" name="position-x">
-                <input class="form-control form-control-sm mt-2" placeholder="Y" name="position-y">
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">x</span>
+                    <input class="form-control " name="position-x" onchange="window.fireCommand('EditFigure', {field: 'x', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">y</span>
+                    <input class="form-control" name="position-y" onchange="window.fireCommand('EditFigure', {field: 'y', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">z</span>
+                    <input class="form-control" name="position-z" onchange="window.fireCommand('EditFigure', {field: 'z', value: this.value})">
+                </div>
             </div>
             <div class="list-group-item">
                 <small class="text-black-50">Größe</small>
-                <input class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="width">
-                <input class="form-control form-control-sm mt-2" placeholder="Höhe (h)" name="height">
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">Länge</span>
+                    <input class="form-control" name="width" onchange="window.fireCommand('EditFigure', {field: 'w', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">Höhe</span>
+                    <input class="form-control" name="height" onchange="window.fireCommand('EditFigure', {field: 'h', value: this.value})">
+                </div>
+                
             </div>
             <div class="list-group-item">
                 <small class="text-black-50">Farbe</small>
-                <input type="color" class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="shape-color">
+                <input type="color" class="form-control form-control-sm mt-2" name="shape-color" onchange="window.fireCommand('EditFigure', {field: 'color', value: this.value})">
             </div>
             <div class="list-group-item">
                 <small class="text-black-50">Schatten</small>
-                <input type="color" class="form-control form-control-sm mt-2" placeholder="Länge (w)" name="shadow-color">
-                <input class="form-control form-control-sm mt-2" placeholder="X" name="shadow-x">
-                <input class="form-control form-control-sm mt-2" placeholder="Y" name="shadow-y">
-                <input class="form-control form-control-sm mt-2" placeholder="Verwischen px" name="blur-x">
+                <input type="color" class="form-control form-control-sm mt-2" name="shadow-color" onchange="window.fireCommand('EditFigure', {field: 'shadow.color', value: this.value})">
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">x</span>
+                    <input class="form-control"name="shadow-offsetX" onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetX', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">y</span>
+                    <input class="form-control" name="shadow-offsetY" onchange="window.fireCommand('EditFigure', {field: 'shadow.offsetY', value: this.value})">
+                </div>
+                <div class="input-group input-group-sm mt-2">
+                    <span class="input-group-text">px</span>
+                    <input class="form-control" name="shadow-blur" onchange="window.fireCommand('EditFigure', {field: 'shadow.blur', value: this.value})">
+                </div>
             </div>
         </div>
     </div>

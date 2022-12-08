@@ -1,71 +1,50 @@
+import FigureModel from "../../figureModel.js";
+
 const CONTROL_COLOR = '#00b8ff';
-const DEFAULT_SHAPE_COLOR = '#8f8f8f';
-const DEFAULT_WIDTH = 50;
-const DEFAULT_HEIGHT = 50;
-const X_CENTER_POSITION = Math.floor(document.getElementById('editor-window').offsetWidth / 2);
-const Y_CENTER_POSITION = Math.floor(document.getElementById('editor-window').offsetHeight / 2);
 export default class Element {
     controlShowed = false;
 
     /**
-     * @param {{
-     *     x: number,
-     *     y: number,
-     *     w: number,
-     *     h: number,
-     *     color?: string
-     * }} data
+     * @param {FigureModel} figure
      * @param stage
      */
-    constructor(name, data, stage) {
-        this.name = name;
+    constructor(figure, stage) {
+        this.figure = figure;
         this.stage = stage;
 
-        const dataKeys = Object.keys(data);
-        if(!('x' in dataKeys)) data.x = X_CENTER_POSITION;
-        if(!('y' in dataKeys)) data.y = Y_CENTER_POSITION;
-        if(!('w' in dataKeys)) data.w = DEFAULT_WIDTH;
-        if(!('h' in dataKeys)) data.h = DEFAULT_HEIGHT;
-        if(!('color' in dataKeys)) data.color = DEFAULT_SHAPE_COLOR;
+        this.graphics = this.getGraphics();
+        this.shape = this.getShape();
 
-        this.graphics = this.getGraphics(data);
-        this.shape = this.getShape(data);
-        this.shape.regX = this.w / 2;
-        this.shape.regY = this.h / 2;
-        this.shape.shadow = new createjs.Shadow('#000',4,4,5);
         this.stage.addChild(this.shape);
-        this.drawControl(data);
+        this.drawControl();
 
-        this.setSize(data.w, data.h);
-        this.setPosition(data.x, data.y);
+        this.setSize(this.figure.w, this.figure.h);
+        this.setPosition(this.figure.x, this.figure.y);
 
-        this.setShapeX(data.x);
-        this.setShapeY(data.y);
-
-        this.setShapeW(data.w);
-        this.setShapeH(data.h);
-        this.color = data.color || '#eeeeee';
+        this.updateShape();
     }
 
-    getGraphics(data) {
+    getGraphics() {
         const graphics = new createjs.Graphics();
-        graphics.beginFill(data.color ?? null);
-        graphics.drawRect(0, 0, data.w, data.h);
+        graphics.beginFill(this.figure.color);
+        graphics.drawRect(0, 0, this.figure.width, this.figure.height);
         return graphics;
     }
 
-    getShape(data) {
+    getShape() {
         return new createjs.Shape(this.graphics);
     }
 
     setPosition(x = null, y = null) {
-        if (x !== null) this.x = x;
-        if (y !== null) this.y = y;
+        if (x !== null) this.figure.x = Math.floor(x);
+        if (y !== null) this.figure.y = Math.floor(y);
+        window.fireCommand('UpdateOptions');
     }
 
     setSize(w = null, h = null) {
-        if (w !== null) this.w = w;
-        if (h !== null) this.h = h;
+        if (w !== null) this.figure.width = Math.floor(w);
+        if (h !== null) this.figure.height = Math.floor(h);
+        window.fireCommand('UpdateOptions');
     }
 
     setShapeX(x) {
@@ -104,15 +83,32 @@ export default class Element {
         return this.graphics.command.h;
     }
 
-    drawControl(data) {
+    setShapeZ(z) {
+        this.stage.setChildIndex(this.shape, z);
+    }
+
+    setShadow(shadow = null) {
+        this.shape.shadow = new createjs.Shadow(shadow.color, shadow.offsetX, shadow.offsetY, shadow.blur);
+    }
+
+    updateShape() {
+        this.setShapeX(this.figure.x);
+        this.setShapeY(this.figure.y);
+        this.setShapeW(this.figure.width);
+        this.setShapeH(this.figure.height);
+        this.setShapeZ(this.figure.z);
+        this.setShadow(this.figure.shadow);   
+    }
+
+    drawControl() {
         this.controlShape = new createjs.Shape();
         this.controlShape.graphics.setStrokeStyle(2).beginStroke(CONTROL_COLOR);
-        this.controlShape.graphics.drawRect(0, 0, data.w ?? 50, data.h ?? 50);
+        this.controlShape.graphics.drawRect(0, 0, this.figure.width ?? 50, this.figure.height ?? 50);
         this.stage.addChild(this.controlShape);
 
         this.shape.on('click', (event) => {
             event.stopPropagation();
-            window.fireCommand('SelectElement', {name: this.name})
+            window.fireCommand('SelectFigure', {id: this.figure.id});
         });
 
         this.controlShape.on('mouseover', (event) => {
@@ -139,14 +135,14 @@ export default class Element {
         this.shape.on('pressmove', (event) => {
             if (this.controlShowed) {
                 if (this.holdPositionX === undefined) {
-                    this.holdPositionX = event.stageX - this.x;
+                    this.holdPositionX = event.stageX - this.figure.x;
                 }
                 if (this.holdPositionY === undefined) {
-                    this.holdPositionY = event.stageY - this.y;
+                    this.holdPositionY = event.stageY - this.figure.y;
                 }
 
                 this.setShapeX(event.stageX - this.holdPositionX);
-                this.setShapeY(event.stageY - this.holdPositionY)
+                this.setShapeY(event.stageY - this.holdPositionY);
             }
         });
 
@@ -184,14 +180,13 @@ export default class Element {
 
         this.controlShape.on('pressup', (event) => {
             delete this.controled;
-            this.setSize(this.controlShape.graphics.command.w, this.controlShape.graphics.command.h)
+            this.setSize(Math.floor(this.controlShape.graphics.command.w), Math.floor(this.controlShape.graphics.command.h));
         })
     }
 
     showControl() {
         if (!this.controlShowed) {
             this.controlShape.visible = true;
-            this.stage.setChildIndex(this.shape,this.stage.getNumChildren()-2)
             this.stage.setChildIndex(this.controlShape,this.stage.getNumChildren()-1)
             this.controlShowed = true;
         }

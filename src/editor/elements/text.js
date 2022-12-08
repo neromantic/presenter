@@ -2,20 +2,27 @@ import Element from './element.js';
 
 export default class Text extends Element {
 
-    getShape(data) {
-        return new createjs.Text(data.text ?? 'Text');
+    getShape() {
+        return new createjs.Text(this.figure.text.text, this.figure.text.size + 'px Arial');
     }
 
-    getGraphics(data) {
+    getGraphics() {
         return null;
     }
 
     setShapeW(w) {
-        this.shape.scaleX = w / 20;
+        this.shape.maxWidth  = w;
         this.controlShape.graphics.command.w = w;
     }
     setShapeH(h) {
-        this.shape.scaleY = h / 10;
+        this.shape.max = h / 10;
         this.controlShape.graphics.command.h = h;
+    }
+
+    updateShape() {
+        this.shape.font = this.figure.text.size + 'px Arial';
+        this.shape.text = this.figure.text.text;
+        this.shape.color = this.figure.color;
+        super.updateShape();
     }
 }

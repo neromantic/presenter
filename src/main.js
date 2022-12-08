@@ -6,6 +6,7 @@ const _ModelView = new ModelView();
  * @param {string} command
  * @param {any|null} data
  */
-window.fireCommand = (command, data = null) => {
-    _ModelView["handle" + command](data);
+window.fireCommand = async (command, data = null) => {
+    const method = "handle" + command;
+    _ModelView[method](data);
 }

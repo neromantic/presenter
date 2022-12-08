@@ -2,48 +2,34 @@ import Rectangle from "./elements/rectangle.js";
 import Circle from "./elements/circle.js";
 import Text from "./elements/text.js";
 
-const EDITOR_WINDOW_ID = 'editor-stack-window';
-
 const ELEMENTS_MAP = {
     'Rectangle': Rectangle,
     'Circle': Circle,
     'Text' : Text
 };
 
-const ELEMENTS_DEFAULT_NAME_COUNTER = {
-    'Rectangle' : 0,
-    'Circle' : 0,
-    'Text' : 0
-};
-
 export default class Editor {
+    elements = {};
     constructor() {
-        this.stage = new createjs.Stage(EDITOR_WINDOW_ID);
+        this._initStage();
+    }
+
+    _initStage() {
+        this.stage = new createjs.Stage('editor-stack-window');
         this.stage.enableMouseOver(100);
         createjs.Ticker.framerate = 60;
         createjs.Ticker.interval = 10;
         createjs.Ticker.on("tick", this.stage);
         createjs.Ticker.timingMode = createjs.Ticker.RAF;
 
-        /**
-         * @type {{[key:string]: Element}}
-         */
-        this.elements = {};
-
-        this.stage.releaseControl = (except) => {
-            for (const elementName in this.elements) {
-                if (elementName !== except.name) {
-                    this.elements[elementName].hideControl();
-                }
-            }
-        }
-
         this.stage.on('stagemousedown', (event) => {
-            for (const elementName in this.elements) {
-                const element = this.elements[elementName];
+            for (const id in this.elements) {
+                const element = this.elements[id];
+                const figure = element.figure;
+                
                 if(
-                    (event.stageX < element.x - 2 || event.stageX > element.x + element.w + 2)
-                    || (event.stageY < element.y - 2 || event.stageY > element.y + element.w + 2)
+                    (event.stageX < figure.x - 2 || event.stageX > figure.x + figure.width + 2)
+                    || (event.stageY < figure.y - 2 || event.stageY > figure.y + figure.height + 2)
                 ) {
                     element.hideControl();
                 }
@@ -51,22 +37,37 @@ export default class Editor {
         });
     }
 
-    /**
-     * @param {[{w?: number, x?: number, h?: number, y?: number, type: keyof ELEMENTS_MAP}]} data
-     */
-    loadElements(data) {
-        for (const elementData of data) {
-            const name = elementData.type + ' ' + ELEMENTS_DEFAULT_NAME_COUNTER[elementData.type];
-            ELEMENTS_DEFAULT_NAME_COUNTER[elementData.type] = ELEMENTS_DEFAULT_NAME_COUNTER[elementData.type] + 1;
-            this.stage.releaseControl(name);
-            this.elements[name] = new ELEMENTS_MAP[elementData.type](name, elementData, this.stage);
-            this.elements[name].showControl();
+    releaseControl()  {
+        for (const element in this.elements) {
+            this.elements[element].hideControl();
         }
     }
 
-    selectElement(name) {
-        const element = this.elements[name];
-        this.stage.releaseControl(name);
+    addFigure(figure) {
+        this.elements[figure.id] = new ELEMENTS_MAP[figure.type](figure, this.stage);
+    }
+
+    addFigures(figures) {
+        for (const figure of figures) {
+            this.elements[figure.id] = new ELEMENTS_MAP[figure.type](figure, this.stage);
+            this.elements[figure.id].showControl();
+        }
+    }
+
+    selectFigure(id) {
+        const element = this.elements[id];
+        this.releaseControl();
         element.showControl();
+    }
+
+    updateFigure(id) {
+        const element = this.elements[id];
+        element.updateShape();
+    }
+
+    deleteFigure(id) {
+        const element = this.elements[id];
+        this.stage.removeChild(element.shape);
+        this.stage.removeChild(element.controlShape);
     }
 }

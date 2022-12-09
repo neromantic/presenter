@@ -9,16 +9,16 @@ export default class ModelView {
     _preview = new Preview();
 
     constructor() {
-        document.onkeydown = function(e) {
-            if(e.keyCode === 46) {
+        document.onkeydown = function (e) {
+            if (e.keyCode === 46) {
                 window.fireCommand('DeleteFigure');
             }
-            if(e.keyCode === 68 && e.ctrlKey) {
+            if (e.keyCode === 68 && e.ctrlKey) {
                 window.fireCommand('CloneFigure');
             }
         };
     }
-d
+    d
     /**
      * @param {typeof FigureModel}} data 
      */
@@ -27,7 +27,7 @@ d
         this._figures[figure.id] = figure;
         this._selectFigureId = figure.id;
         this._editor.addFigure(figure);
-        window.fireCommand('SelectFigure', {id: figure.id})
+        window.fireCommand('SelectFigure', { id: figure.id })
     }
     /**
      * @param {typeof FigureModel}} data 
@@ -36,7 +36,7 @@ d
         const figure = this._figures[this._selectFigureId].clone();
         this._figures[figure.id] = figure;
         this._editor.addFigure(figure);
-        window.fireCommand('SelectFigure', {id: figure.id})
+        window.fireCommand('SelectFigure', { id: figure.id })
     }
 
     handleSelectFigure(data) {
@@ -47,9 +47,9 @@ d
 
     handleEditFigure(data) {
         const figure = this._figures[this._selectFigureId];
-        if(!figure) return;
+        if (!figure) return;
 
-        switch(data.field) {
+        switch (data.field) {
             case 'x':
                 figure.x = Number.parseInt(data.value);
                 break;
@@ -74,7 +74,7 @@ d
                 break;
             case 'shadow.offsetX':
                 figure.shadow.offsetX = data.value.length > 0 ? Number.parseInt(data.value) : null;
-                break;  
+                break;
             case 'shadow.offsetY':
                 figure.shadow.offsetY = data.value.length > 0 ? Number.parseInt(data.value) : null;
                 break;
@@ -109,11 +109,11 @@ d
         optionWindow.querySelector('[name="height"]').value = figure.height;
         optionWindow.querySelector('[name="shape-color"]').value = figure.color;
         optionWindow.querySelector('[name="shadow-color"]').value = figure.shadow.color;
-        optionWindow.querySelector('[name="shadow-offsetX"]').value = figure.shadow.offsetX;    
+        optionWindow.querySelector('[name="shadow-offsetX"]').value = figure.shadow.offsetX;
         optionWindow.querySelector('[name="shadow-offsetY"]').value = figure.shadow.offsetY;
         optionWindow.querySelector('[name="shadow-blur"]').value = figure.shadow.blur;
 
-        if(figure.type === 'Text') {
+        if (figure.type === 'Text') {
             optionWindow.querySelector('#text-block').style.display = 'block';
             optionWindow.querySelector('[name="text-text"]').value = figure.text.text;
             optionWindow.querySelector('[name="text-weight"]').value = figure.text.weight;
@@ -124,9 +124,18 @@ d
     }
 
     handleDeleteFigure() {
-        if(this._selectFigureId !== null) {
+        if (this._selectFigureId !== null) {
             this._editor.deleteFigure(this._selectFigureId);
             this._selectFigureId = null;
         }
+    }
+
+    handleExport() {
+        const { ipcRenderer } = require("electron");
+        this._editor.releaseControl();
+        const canvas = document.getElementById('editor-stack-window');
+        const url = canvas.toDataURL('image/png', .8);
+        const base64Data = url.replace(/^data:image\/png;base64,/, "");
+        ipcRenderer.send('Export', base64Data);
     }
 }

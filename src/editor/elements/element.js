@@ -117,7 +117,12 @@ export default class Element {
         });
 
         this.controlShape.on('mouseover', (event) => {
-            if ((event.stageX > event.target.x + event.target.graphics.command.w - 2 || event.stageX < event.target.x + 2) && (event.stageY > event.target.y + 2 && event.stageY < event.target.y + event.target.graphics.command.h - 2)) {
+            if ((event.stageX > event.target.x + event.target.graphics.command.w - 2 
+                    || event.stageX < event.target.x + 2) 
+                && 
+                (event.stageY > event.target.y + 2 
+                    && event.stageY < event.target.y + event.target.graphics.command.h - 2)) 
+            {
                 this.horizontalControl = true;
                 document.getElementById('editor-stack-window').classList.add('resize-horizontal');
                 document.getElementById('editor-stack-window').classList.remove('resize-vertical');
@@ -185,7 +190,7 @@ export default class Element {
 
         this.controlShape.on('pressup', (event) => {
             delete this.controled;
-            this.setSize(Math.floor(this.controlShape.graphics.command.w), Math.floor(this.controlShape.graphics.command.h));
+            this.setSize(this.controlShape.graphics.command.w, this.controlShape.graphics.command.h);
         })
     }
 

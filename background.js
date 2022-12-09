@@ -1,4 +1,5 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const fs = require('fs');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -11,10 +12,11 @@ const createWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
+        hasShadow: true,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
-            contextIsolation: false,
+            enableRemoteModule: true,
+            contextIsolation: false
         },
     });
 
@@ -44,6 +46,21 @@ app.on('activate', () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
+    }
+});
+
+ipcMain.on('Export', async function (event, data) {
+    let filename = await dialog.showSaveDialog(
+        BrowserWindow.getFocusedWindow(),
+        {
+            title: 'Export PNG',
+            filters: [{ name: 'Bild', extensions: ['png'] }]
+        }
+    );
+    if(!filename.canceled) {
+        fs.writeFileSync(filename.filePath, Buffer.from(data, 'base64'), () => {
+            console.log("attempted to write to the desktop");
+        });
     }
 });
 
